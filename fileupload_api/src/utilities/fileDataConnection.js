@@ -1,4 +1,5 @@
-const { HttpError } = require('http-errors');
+
+const createError = require('http-errors');
 const mongoose = require('mongoose');
 const  Schema  = mongoose.Schema
 mongoose.Promise = global.Promise;
@@ -21,8 +22,7 @@ createConnection.getCollection = () => {
     return mongoose.connect(url).then(database => {
         return database.model('FileData', fileDataSchema)
       }).catch(error => {
-        let err = new HttpError("Could not connect to the database");
-        err.status = 500;
+        const err = createError(500,"Could not connect to the database");
         throw err;
       });
 }
