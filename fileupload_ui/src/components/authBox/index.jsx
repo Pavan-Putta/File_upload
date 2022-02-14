@@ -167,9 +167,9 @@ export function AuthBox(props) {
   }
 
   const authListner = () => {
-    onAuthStateChanged(auth, (user) => {
-      if(user){
-        setUser(user);
+    onAuthStateChanged(auth, (userData) => {
+      if(userData){
+        setUser(userData.providerData[0]);
       }else {
         // clearUserInputs();
         setUser(null);
@@ -206,7 +206,7 @@ export function AuthBox(props) {
 
   const contextValue = { switchToSignup, switchToSignin, handleLogin, handleSignUp, handleLogut,
      setUserName, setUserEmail, setuPass, setconfirmPass, setemailError, setpassError,
-     userName, uEmail, uPass, confirmPass, emailError, passError };
+     userName, uEmail, uPass, confirmPass, emailError, passError, user };
 
   return (
     <AuthContext.Provider value={contextValue}>

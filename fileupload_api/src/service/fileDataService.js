@@ -8,5 +8,11 @@ file.uploadFile = (fData) =>{
   })
 }
 
+file.getFileData = (uEmail) =>{
+  return dbLayer.getData(uEmail).then(ele =>{
+    return ele;
+  })
+}
+
 
 module.exports = file

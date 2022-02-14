@@ -22,9 +22,18 @@ file.uploadFileData = async (fData) =>{
           const err = createError(401,"Unable upload the details!!");
           throw err;
         }
-    }
-    
-   
+    }      
+}
+
+file.getData = async (uEmail) =>{
+  const fileDataColl = await collection.getCollection();
+  const files = await fileDataColl.find({ _id: uEmail });
+  if (files.length === 1) {
+    return files[0].fileData;
+  }else{
+    const err = createError(404,"No file uploaded yet, please upload a Json file!!");
+    throw err;
+  }
 }
 
 module.exports = file

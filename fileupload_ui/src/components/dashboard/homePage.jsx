@@ -19,8 +19,9 @@ const CardDiv = styled.div`
 const HomePage = () => {
 
     const [fileData, setFileData] = useState(null);
-    const [data, setData] = useState(false);
-    const {uEmail, handleLogut } = useContext(AuthContext);
+    const [fileDataList, setFileDataList] = useState([]);
+    const [viewData, setViewData] = useState(false);
+    const { user, handleLogut } = useContext(AuthContext);
 
     const validateFile = (uploadFile) => {
         console.log(uploadFile);
@@ -29,28 +30,50 @@ const HomePage = () => {
         // const dotIndex = uploadFile.lastIndexOf(".") + 1;
         // const fileExtension = uploadFile.substr(dotIndex, uploadFile.length).toLowerCase();
         if (uFile.type === 'application/json') {
-        const reader = new FileReader();
-        reader.readAsText(uFile);
-        reader.onload = () => {
-            console.log(uFile.name,reader.result);
-            setFileData(reader.result);
-        }
+            const reader = new FileReader();
+            reader.readAsText(uFile);
+            reader.onload = () => {
+                console.log(uFile.name, reader.result);
+                try {
+                    JSON.parse(JSON.stringify(reader.result));
+                    setFileData(reader.result);
+                } catch (error) {
+                    setFileData(null);
+                }
+            }
         }else {
             setFileData(null);
-        alert("Only json files are allowed!");
+            alert("Only json files are allowed!");
         }
     }
 
     const handleUpload = () => {
         const url = 'http://localhost:4500/fileUpload'
-        if(fileData) {
-            const data = {_id: "pavan@gmail.com", fileData: JSON.parse(fileData)};
+        if(fileData && user) {
+            const data = {_id: user.email, fileData: null };
+            setFileData(null);
             axios.post(url,data).then( (value) => {
                 console.log(value);
+                alert("File Upload Successfull!");
             }).catch((error) => {
                 console.log(error);
+                alert(error.message);
             })
+        } else {
+           alert("Please select a Json file!");
         }
+    }
+
+    const handleData = () => {
+        setViewData(true);
+        const url = `http://localhost:4500/viewData/${user.email}`
+        axios.get(url).then( (value) => {
+            // console.log(value.data.fData);
+            setFileDataList(value.data.fData);
+        }).catch((error) => {
+            setFileDataList([]);
+            console.log(error);
+        })
     }
     
     return (
@@ -58,17 +81,38 @@ const HomePage = () => {
             <nav className="navbar navbar-expand-sm bg-dark navbar-dark">
                 <h2 className="navbar-brand">Welcome</h2>
                 <ul className="navbar-nav">
-                    <li className="nav-item active">
-                        <span className="nav-link" onClick={() => setData(false)} >Home</span>
+                    <li className={viewData ? "nav-item" : "nav-item active"}>
+                        <span className="nav-link" onClick={() => setViewData(false)} >Home</span>
                     </li>
-                    <li className="nav-item">
-                        <span className="nav-link" onClick={() => setData(true)}  >Link</span>
+                    <li className={viewData ? "nav-item active" : "nav-item"}>
+                        <span className="nav-link" onClick={() => handleData() } >View Data</span>
                     </li>
                 </ul>
                 <button className="btn btn-danger ml-auto" onClick={handleLogut}>Logout</button>
             </nav>
-            {data ? (
-               <div></div>
+            {viewData ? (
+                <div className="m-4">
+                    <table className="table table-hover">
+                        <thead className="thead-dark">
+                            <tr>
+                                <th>User Id</th>
+                                <th>Title</th>
+                                <th>Body Text</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                                fileDataList.map(row => 
+                                    <tr key={row.id}>
+                                        <td>{row.userId}</td>
+                                        <td>{row.title}</td>
+                                        <td>{row.body}</td>
+                                    </tr>
+                                )
+                            }
+                        </tbody>
+                    </table>
+                </div>
             ) : (
                 <CardDiv>
                 <div className="card w-50" >

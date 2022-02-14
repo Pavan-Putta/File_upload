@@ -35,4 +35,12 @@ routing.post('/fileUpload',(req,res,next) => {
 
 });
 
+routing.get('/viewData/:uEmail',(req,res,next) => {
+  const uEmail = req.params.uEmail;
+  return fileService.getFileData(uEmail).then(ele => 
+    res.json({fData : ele})       
+  ).catch(err => next(err))
+
+});
+
 module.exports = routing
