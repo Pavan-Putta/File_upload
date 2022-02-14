@@ -50,7 +50,7 @@ const HomePage = () => {
     const handleUpload = () => {
         const url = 'http://localhost:4500/fileUpload'
         if(fileData && user) {
-            const data = {_id: user.email, fileData: null };
+            const data = {_id: user.email, fileData: JSON.parse(fileData) };
             setFileData(null);
             axios.post(url,data).then( (value) => {
                 console.log(value);
